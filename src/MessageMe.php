@@ -16,19 +16,18 @@ class MessageMe
     private static $messages = null;// placeholder for messages when switching to instance.
 
     /**
-     * @param string $message
-     * @param int|string $position
-     * @param int|string $type
+     * @param $message
+     * @param int $position
+     * @param array $attributes
      */
-    public static function newMessage($message, $position, $type = 0){
+    public static function addMessage($message, $position = 0, Array $attributes = array()){
 
         self::isValidKey($position,'$position');
-        self::isValidKey($type,'$type');
         self::isValidKey(self::$messageSessionName,self::class.'::$messageSessionName');
 
         $a = (isset($_SESSION[self::$messageSessionName]) ? $_SESSION[self::$messageSessionName] : []);
 
-        $a[$position][$type][] = $message;
+        $a[$position][] = ['message' => $message, 'attributes' => $attributes];
 
         $_SESSION[self::$messageSessionName] = $a;
 
@@ -66,19 +65,23 @@ class MessageMe
 
     private function __construct(){
 
-        $this->__messages = self::$messages;
+        $this->__messages = $this->processMessages(self::$messages);
         self::$messages = null;
 
     }
 
-    public function getMessages($position = null){
-
-        if(is_null($position)){
-            return $this->__messages;
+    private function processMessages(Array $messageArray){
+        $a = array();
+        foreach ($messageArray as $positionName => $positionValues){
+            foreach($positionValues as $messageNumber => $messageValues){
+                $a[$positionName][$messageNumber] = Message::start($messageValues['message'],$positionName,$messageValues['attributes']);
+            }
         }
+        return $a;
+    }
 
-        return $this->__messages;
-
+    public function getMessages($position = null){
+        return (!is_null($position) ? $this->__messages[$position] : $this->__messages);
     }
 
 }
