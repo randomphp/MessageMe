@@ -81,7 +81,7 @@ class MessageMe
     }
 
     public function getMessages($position = null){
-        return (!is_null($position) ? $this->__messages[$position] : $this->__messages);
+        return (!is_null($position) ? (isset($this->__messages[$position]) && is_array($this->__messages[$position]) ? $this->__messages[$position] : []) : $this->__messages);
     }
 
 }

@@ -45,4 +45,9 @@ class Message
         return ($this->hasAttribute($name) ? $this->__attributes[$name] : null);
     }
 
+    public function __toString()
+    {
+        return (!is_string($this->__message) ? '' : $this->__message);
+    }
+
 }
